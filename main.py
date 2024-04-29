@@ -21,19 +21,19 @@ depthAI = DE.DepthEstimator()
 @app.route('/getPCD', methods = ['POST','OPTIONS'])
 def generatePCD():
     if request.method == 'OPTIONS':
-        return cors_flight_response()
+        return cors_flight_response() #returns allow headers to avoid cors violations
     elif request.method == 'POST':
         try:
             req_data = request.json
             req_data = req_data['img']
-            originalImg = postToImg(req_data)
-            depthMap = depthAI.predictDepthMap(originalImg)
-            return pcdGen(originalImg,depthMap),200
+            originalImg = postToImg(req_data) #Get pil image from b64 string
+            depthMap = depthAI.predictDepthMap(originalImg) #Produce depth map
+            return pcdGen(originalImg,depthMap),200 #return point cloud with ok status 200
         except Exception as e:
             traceback.print_exc() 
             return jsonify({'status': 'error', 'message': str(e)}), 400
     else:
-         raise RuntimeError("Weird - don't know how to handle method {}".format(request.method))
+         raise RuntimeError("Unable to handle method {}".format(request.method))
 
 def postToImg(imgData):
     try:
